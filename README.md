@@ -2,15 +2,15 @@
 
 Five gates, evaluated in order, on 122 ETFs and 181 cross-asset ratios. A candidate clears each gate independently — there is no score, and nothing compensates for anything else.
 
-| # | Gate | Tunable | Fixed |
-|---|------|---------|-------|
+| # | Gate | On the Screen tab | Default rule |
+|---|------|-------------------|--------------|
 | 1 | Depth | minimum drawdown (35%) | measured from the highest close of the last 5 years |
-| 2 | Duration | minimum age of that peak (12m) | — |
+| 2 | Duration | minimum age of that peak (12m) | no upper bound |
 | 3 | No new lows | minimum days since the last 252-day low (126) | capped at 504 days so the damage stays recent |
 | 4 | Curvature | on / off | 100-day average rising over 60 sessions, and price above it |
 | 5 | Vol contraction | current percentile ceiling (30th) | ranked over 5 years; must have exceeded the 70th within 18 months |
 
-Four sliders, one checkbox, three presets. Everything else is held constant and documented in the Method section at the bottom of the page.
+Two tabs. **Screen** carries four sliders, one checkbox and three presets — the thresholds worth moving day to day. **Settings** carries every window, rule and both lists.
 
 ---
 
@@ -24,9 +24,23 @@ The default view shows anything clearing **4 or 5 gates**, assets and ratios tog
 
 **The funnel strip** in the header is the count surviving each gate, one line for assets and one for ratios. If a single gate eliminates almost everything and the rest eliminate nothing, the screen is that gate wearing a costume. If the last number reads two, the setup is absent right now — that is a result, not a prompt to loosen thresholds.
 
-**Presets.** Strict is 45% / 15 months / 160 days / 20th percentile. Balanced is the default. Loose is 25% / 9 months / 90 days / 45th.
+**Presets.** Strict is 45% / 15 months / 160 days / 20th percentile. Balanced is the default. Loose is 25% / 9 months / 90 days / 45th. Presets move only those four thresholds — anything you changed in Settings survives.
 
 **The curvature checkbox** is the watchlist switch. Gate 4 is the slowest to confirm — the base has to build before an average can turn — so it will often fire months after gate 5. Turn it off, let gates 1, 2, 3 and 5 build the list, and use the turn as your entry trigger.
+
+---
+
+## Settings tab
+
+One card per gate, holding everything the Screen tab hides: the look-back window for the reference high, the new-low window and its cap, the average length and slope window, the volatility windows and percentile history, an optional upper bound on peak age. Numbers that can invert each other are clamped on entry — set the maximum days below the minimum and it snaps back rather than silently returning nothing.
+
+Two options there are worth knowing about:
+
+**Reference high** can be switched from the highest close to the highest 60-day mean. An asset that doubles and halves is mechanically 50% off its high while sitting exactly where it started, because a single print set the reference. A 60-day mean leaves a sustained top almost unchanged and strips most of the height out of a short spike. It is not an extra gate, just a different reference price.
+
+**Quadratic curvature** replaces the moving-average slope with a fit of `log(P) = at² + bt + c`, requiring `a > 0` (bowl-shaped) and `2a + b > 0` (rising at the right edge). It measures the second derivative directly rather than through an average, so it has no base effect and typically confirms a couple of months earlier. The moving-average slope has a known artifact: the average moves by the new bar minus the dropped bar, so a large down day rolling out of the window can turn it positive with no new information in current price — which is why the default also requires price above the average.
+
+Both lists live at the bottom of the tab. Editing the ratio list rebuilds from prices already in memory, so no re-scan is needed and any ratio whose leg is missing from the asset list is named rather than silently dropped. Editing the asset list does need a re-scan. Settings and lists persist in the browser; **Reset everything to defaults** restores the shipped configuration.
 
 ---
 

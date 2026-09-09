@@ -152,6 +152,71 @@
     font-family: inherit; font-size: 10.5px; padding: 9px; border-radius: 3px; resize: vertical;
   }
 
+  /* ---------- tabs ---------- */
+  .tabs { display: flex; gap: 0; margin-top: 12px; }
+  .tabs button {
+    background: transparent; border: none; border-bottom: 2px solid transparent;
+    color: var(--text-mute); font-family: inherit; font-size: 11px;
+    letter-spacing: .07em; text-transform: uppercase; font-weight: 600;
+    padding: 8px 16px 9px; cursor: pointer;
+  }
+  .tabs button:hover { color: var(--text-dim); }
+  .tabs button.on { color: var(--amber); border-bottom-color: var(--amber); }
+  .tabs button:focus-visible { outline: 2px solid var(--amber); outline-offset: -3px; }
+
+  body.settings .screen-only { display: none !important; }
+  body:not(.settings) #settingsView { display: none; }
+
+  /* ---------- settings ---------- */
+  #settingsView { padding: 24px 0 20px; }
+  .set-intro { max-width: 76ch; color: var(--text-dim); font-size: 11.5px; line-height: 1.7; margin-bottom: 22px; }
+  .set-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(255px, 1fr)); gap: 1px;
+              background: var(--border); border: 1px solid var(--border); }
+  .set-card { background: var(--bg-card); padding: 16px 18px 18px; }
+  .set-card h4 {
+    font-family: 'Fraunces', serif; font-size: 15px; font-weight: 600; color: var(--text);
+    margin-bottom: 4px;
+  }
+  .set-card h4 span { color: var(--amber); margin-right: 6px; }
+  .set-card .note {
+    font-size: 10px; color: var(--text-mute); line-height: 1.55;
+    padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border);
+  }
+  .set-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    margin-bottom: 10px; font-size: 10.5px; color: var(--text-dim);
+  }
+  .set-row:last-child { margin-bottom: 0; }
+  .set-row label { flex: 1; }
+  .set-row input[type="number"], .set-row select {
+    width: 108px; background: var(--bg); border: 1px solid var(--border-strong);
+    color: var(--text); font-family: inherit; font-size: 11px; padding: 5px 7px; border-radius: 3px;
+  }
+  .set-row select { width: 132px; }
+  .set-row input:focus, .set-row select:focus { outline: none; border-color: var(--amber); }
+  .set-row.wide { flex-direction: column; align-items: stretch; gap: 6px; }
+  .set-row.wide select, .set-row.wide input { width: 100%; }
+  .set-row.check { justify-content: flex-start; }
+  .set-row.check input { accent-color: var(--amber); }
+
+  .set-lists { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 26px; }
+  .set-lists h4 {
+    font-family: 'Fraunces', serif; font-size: 15px; color: var(--text); margin-bottom: 4px;
+  }
+  .set-lists .note { font-size: 10px; color: var(--text-mute); margin-bottom: 8px; line-height: 1.55; }
+  .set-lists textarea {
+    width: 100%; height: 320px; background: var(--bg-card);
+    border: 1px solid var(--border-strong); color: var(--text-dim);
+    font-family: inherit; font-size: 10.5px; padding: 10px; border-radius: 3px; resize: vertical;
+  }
+  .set-lists textarea:focus { outline: none; border-color: var(--amber); }
+  .set-foot {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 22px;
+    padding-top: 16px; border-top: 1px solid var(--border);
+    font-size: 10.5px; color: var(--text-mute);
+  }
+  .dirty { color: var(--amber-bright); }
+
   /* ---------- table ---------- */
   main { padding: 0 26px 60px; }
   .status { padding: 10px 0 14px; font-size: 10.5px; color: var(--text-mute); }
@@ -281,13 +346,17 @@
     <span class="hspace"></span>
     <span class="badge" id="modeBadge">idle</span>
   </div>
-  <div class="funnels">
+  <div class="funnels screen-only">
     <div class="fstrip" id="funnelAbs"></div>
     <div class="fstrip" id="funnelRat"></div>
   </div>
+  <div class="tabs">
+    <button data-tab="screen" class="on">Screen</button>
+    <button data-tab="settings">Settings</button>
+  </div>
 </header>
 
-<div class="bar">
+<div class="bar screen-only">
   <button class="btn go" id="scanBtn">Run scan</button>
   <div class="seg" id="segKind">
     <button data-kind="all" class="on">Everything</button>
@@ -306,7 +375,7 @@
   <button class="btn" id="tuneBtn">Tune</button>
 </div>
 
-<div class="tune" id="tunePanel">
+<div class="tune screen-only" id="tunePanel">
   <div class="tune-grid">
     <div class="knob">
       <label for="k_depth">Minimum drawdown <b id="v_depth">35%</b></label>
@@ -339,19 +408,124 @@
       <button data-preset="loose">Loose</button>
     </div>
   </div>
-  <details class="editor">
-    <summary>Edit the asset list</summary>
-    <textarea id="universeInput" spellcheck="false"></textarea>
-  </details>
-  <details class="editor">
-    <summary>Edit the ratio list</summary>
-    <textarea id="pairsInput" spellcheck="false"></textarea>
-  </details>
+  <div class="tune-foot" style="border-top:none;margin-top:6px;padding-top:0">
+    <span>Every window, threshold and both lists live in the <b>Settings</b> tab.</span>
+  </div>
 </div>
 
 <main>
-  <div class="status" id="status">Press <b>Run scan</b> to pull seven years of adjusted closes.</div>
-  <table>
+
+  <div id="settingsView">
+    <p class="set-intro">Everything the cascade measures, in one place. The Screen tab keeps only the four thresholds worth moving day to day; these are the windows and rules underneath them. Changes recompute immediately — a re-scan is only needed if you change the asset list, since ratios are built from assets already in memory.</p>
+
+    <div class="set-grid">
+
+      <div class="set-card">
+        <h4><span>1</span>Depth</h4>
+        <div class="note">How far below its own prior high. Long-horizon reversal, not twelve-month momentum.</div>
+        <div class="set-row"><label for="s_depth">Minimum drawdown %</label>
+          <input type="number" id="s_depth" min="1" max="90" step="1" /></div>
+        <div class="set-row"><label for="s_depthLb">Look back for the high</label>
+          <select id="s_depthLb">
+            <option value="504">2 years</option><option value="756">3 years</option>
+            <option value="1008">4 years</option><option value="1260">5 years</option>
+            <option value="1512">6 years</option><option value="1764">7 years</option>
+          </select></div>
+        <div class="set-row wide"><label for="s_refMode">Reference high</label>
+          <select id="s_refMode">
+            <option value="close">Highest close</option>
+            <option value="mean60">Highest 60-day mean</option>
+          </select></div>
+      </div>
+
+      <div class="set-card">
+        <h4><span>2</span>Duration</h4>
+        <div class="note">Age of that high. Removes crashes still in progress, and parabolas that only just rolled over.</div>
+        <div class="set-row"><label for="s_dur">Minimum months since peak</label>
+          <input type="number" id="s_dur" min="0" max="60" step="1" /></div>
+        <div class="set-row"><label for="s_durMax">Maximum months (0 = off)</label>
+          <input type="number" id="s_durMax" min="0" max="84" step="1" /></div>
+      </div>
+
+      <div class="set-card">
+        <h4><span>3</span>No new lows</h4>
+        <div class="note">Days since the last running low. The upper bound keeps the damage recent, so perennially quiet assets do not qualify.</div>
+        <div class="set-row"><label for="s_minLow">Minimum days since low</label>
+          <input type="number" id="s_minLow" min="5" max="900" step="1" /></div>
+        <div class="set-row"><label for="s_maxLow">Maximum days since low</label>
+          <input type="number" id="s_maxLow" min="20" max="1500" step="1" /></div>
+        <div class="set-row"><label for="s_lowWin">New-low window</label>
+          <select id="s_lowWin">
+            <option value="126">126 days</option><option value="189">189 days</option>
+            <option value="252">252 days</option><option value="378">378 days</option>
+            <option value="504">504 days</option>
+          </select></div>
+      </div>
+
+      <div class="set-card">
+        <h4><span>4</span>Curvature</h4>
+        <div class="note">Has the downtrend stopped bending down. The slowest gate to confirm — switch it off to run this as a watchlist.</div>
+        <div class="set-row check"><input type="checkbox" id="s_curve" /><label for="s_curve">Gate enabled</label></div>
+        <div class="set-row wide"><label for="s_curvMethod">Method</label>
+          <select id="s_curvMethod">
+            <option value="ma">Moving-average slope</option>
+            <option value="quad">Quadratic on log price</option>
+          </select></div>
+        <div class="set-row" data-curv="ma"><label for="s_maLen">Average length</label>
+          <input type="number" id="s_maLen" min="20" max="300" step="5" /></div>
+        <div class="set-row" data-curv="ma"><label for="s_slopeWin">Slope window</label>
+          <input type="number" id="s_slopeWin" min="10" max="200" step="5" /></div>
+        <div class="set-row" data-curv="ma"><label for="s_minSlope">Minimum slope %/yr</label>
+          <input type="number" id="s_minSlope" min="-40" max="40" step="1" /></div>
+        <div class="set-row check" data-curv="ma"><input type="checkbox" id="s_aboveMA" /><label for="s_aboveMA">Require price above the average</label></div>
+        <div class="set-row" data-curv="quad" style="display:none"><label for="s_quadWin">Fit window</label>
+          <input type="number" id="s_quadWin" min="40" max="300" step="10" /></div>
+        <div class="set-row check" data-curv="quad" style="display:none"><input type="checkbox" id="s_quadEdge" /><label for="s_quadEdge">Require rising at the right edge</label></div>
+      </div>
+
+      <div class="set-card">
+        <h4><span>5</span>Volatility contraction</h4>
+        <div class="note">Compression that follows expansion. Compression alone just finds assets that were always quiet.</div>
+        <div class="set-row"><label for="s_volWin">Volatility window</label>
+          <input type="number" id="s_volWin" min="5" max="90" step="1" /></div>
+        <div class="set-row"><label for="s_volLow">Current percentile below</label>
+          <input type="number" id="s_volLow" min="1" max="90" step="1" /></div>
+        <div class="set-row"><label for="s_volHigh">Prior peak percentile above</label>
+          <input type="number" id="s_volHigh" min="20" max="99" step="1" /></div>
+        <div class="set-row"><label for="s_volBack">Look back for that peak (months)</label>
+          <input type="number" id="s_volBack" min="3" max="60" step="1" /></div>
+        <div class="set-row"><label for="s_volHist">Percentile history</label>
+          <select id="s_volHist">
+            <option value="504">2 years</option><option value="756">3 years</option>
+            <option value="1008">4 years</option><option value="1260">5 years</option>
+            <option value="1512">6 years</option>
+          </select></div>
+      </div>
+
+    </div>
+
+    <div class="set-lists">
+      <div>
+        <h4>Assets</h4>
+        <div class="note">One per line: <code>TICKER,Name,Group</code>. Changing this needs a re-scan.</div>
+        <textarea id="universeInput" spellcheck="false"></textarea>
+      </div>
+      <div>
+        <h4>Ratios</h4>
+        <div class="note">One per line: <code>NUMERATOR/DENOMINATOR,Label,Class</code>. Both legs must exist in the asset list.</div>
+        <textarea id="pairsInput" spellcheck="false"></textarea>
+      </div>
+    </div>
+
+    <div class="set-foot">
+      <button class="btn" id="resetAll">Reset everything to defaults</button>
+      <button class="btn" id="copyCfg">Copy settings as JSON</button>
+      <span id="setStatus">Edits to the lists apply when you click away from the box.</span>
+    </div>
+  </div>
+
+  <div class="status screen-only" id="status">Press <b>Run scan</b> to pull seven years of adjusted closes.</div>
+  <table class="screen-only">
     <thead>
       <tr>
         <th data-sort="kind">Type</th>
@@ -369,7 +543,7 @@
     <tbody id="tbody"></tbody>
   </table>
 
-  <details class="method">
+  <details class="method screen-only">
     <summary>How the cascade works</summary>
     <div class="body">
       <p>Five gates, evaluated in order. A candidate has to clear each one independently — there is no score, and nothing compensates for anything else. Depth without exhaustion is a falling knife; exhaustion without depth is an asset that was never punished. The tradeable object is the conjunction, which is why the output is usually short.</p>
@@ -402,8 +576,9 @@
       <h3>What it does not do</h3>
       <p>It cannot tell you the base rate. Of everything that clears a deep drawdown plus six months without a new low, some meaningful fraction goes on to make a new low anyway, and only an event study over decades will say what that fraction is. It has no non-price anchor, so an asset in genuine terminal decline can clear every gate. And events cluster: one bad October fires forty of these at once, which is one observation and not forty. This is a research tool, not investment advice.</p>
 
-      <h3>Fixed settings</h3>
-      <p>Held constant so the panel stays small: 5-year window for the reference high; 252-day window for new lows with a 504-day cap; 100-day average with a 60-day slope window; 20-day volatility ranked over five years, with the prior expansion looked for over 18 months above the 70th percentile.</p>
+      <h3>Defaults</h3>
+      <p>5-year window for the reference high; 252-day window for new lows with a 504-day cap; 100-day average with a 60-day slope window and price required above it; 20-day volatility ranked over five years, with the prior expansion looked for over 18 months above the 70th percentile. Every one of these is editable in the <b>Settings</b> tab, along with both lists. The four on the Screen tab are just the ones worth moving day to day.</p>
+      <p>Two options in Settings are worth knowing about. <b>Reference high</b> can be switched from the highest close to the highest 60-day mean: an asset that doubles and halves is mechanically 50% off its high while sitting exactly where it started, because a single print set the reference, and a 60-day mean strips most of the height out of a short spike while leaving a sustained top almost unchanged. <b>Quadratic curvature</b> fits <code>log(P) = at² + bt + c</code> and asks that it be bowl-shaped and rising at the right edge — it measures the second derivative directly instead of through an average, so it has no base effect and typically confirms a couple of months earlier.</p>
 
       <h3>Removed from the source list</h3>
       <p id="cutList"></p>
@@ -753,24 +928,29 @@ const EXCLUDED = [
    Adjusted daily closes from Yahoo Finance via /api/snapshot. Nothing mocked.
    ===================================================================== */
 
-/* Held constant so the tuning panel stays to four knobs. */
-const FIXED = {
+/* Everything below the four Screen-tab knobs. Editable in the Settings tab. */
+const ADVANCED = {
   depthLb: 1260,   // 5y window for the reference high
+  refMode: 'close',
+  durMax: 0,       // 0 = no upper bound on peak age
   lowWin: 252,     // running-low window
   maxLow: 504,     // damage has to be within two years
-  maLen: 100, slopeWin: 60,
+  curvMethod: 'ma', maLen: 100, slopeWin: 60, minSlope: 0, aboveMA: true,
+  quadWin: 120, quadEdge: true,
   volWin: 20, volHigh: 70, volBack: 18, volHist: 1260,
 };
 
+/* Presets move only the four headline thresholds; advanced settings survive. */
 const PRESETS = {
   strict:   { depth: 45, dur: 15, minLow: 160, volLow: 20, curve: true },
   balanced: { depth: 35, dur: 12, minLow: 126, volLow: 30, curve: true },
   loose:    { depth: 25, dur: 9,  minLow: 90,  volLow: 45, curve: true },
 };
 
+const DEFAULTS = { ...ADVANCED, ...PRESETS.balanced };
 const GATE_NAMES = ['Depth', 'Duration', 'No new lows', 'Curvature', 'Vol'];
 
-let cfg = { ...PRESETS.balanced };
+let cfg = { ...DEFAULTS };
 
 const state = {
   dates: [], index: {},
@@ -812,6 +992,32 @@ function olsSlope(y) {
   return b === 0 ? null : a / b;
 }
 
+/** Fit y = a·t² + b·t + c with t normalised to [-1, 1]. Returns {a, b, edge}. */
+function quadFit(y) {
+  const n = y.length;
+  if (n < 8) return null;
+  let S1 = 0, S2 = 0, S3 = 0, S4 = 0, T0 = 0, T1 = 0, T2 = 0;
+  for (let i = 0; i < n; i++) {
+    const t = (2 * i) / (n - 1) - 1, t2 = t * t;
+    S1 += t; S2 += t2; S3 += t2 * t; S4 += t2 * t2;
+    T0 += y[i]; T1 += t * y[i]; T2 += t2 * y[i];
+  }
+  const M = [[S4, S3, S2, T2], [S3, S2, S1, T1], [S2, S1, n, T0]];
+  for (let c = 0; c < 3; c++) {
+    let p = c;
+    for (let r = c + 1; r < 3; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+    if (Math.abs(M[p][c]) < 1e-12) return null;
+    [M[c], M[p]] = [M[p], M[c]];
+    for (let r = 0; r < 3; r++) {
+      if (r === c) continue;
+      const f = M[r][c] / M[c][c];
+      for (let k = c; k < 4; k++) M[r][k] -= f * M[c][k];
+    }
+  }
+  const a = M[0][3] / M[0][0], b = M[1][3] / M[1][1];
+  return { a, b, edge: 2 * a + b };
+}
+
 function rollingMin(arr, win) {
   const out = new Array(arr.length).fill(null);
   const dq = [];
@@ -850,9 +1056,18 @@ function computeMetrics(closes) {
   const m = { price: cur, bars: n };
 
   // 1 — depth
-  const from = n - Math.min(FIXED.depthLb, n);
+  const from = n - Math.min(cfg.depthLb, n);
   let refHigh = -Infinity, peakIdx = from;
-  for (let i = from; i < n; i++) if (closes[i] > refHigh) { refHigh = closes[i]; peakIdx = i; }
+  if (cfg.refMode === 'mean60') {
+    const w = 60, mm = sma(closes, w);
+    for (let i = Math.max(from, w - 1); i < n; i++) {
+      if (mm[i] != null && mm[i] > refHigh) { refHigh = mm[i]; peakIdx = i; }
+    }
+  }
+  if (!isFinite(refHigh)) {
+    refHigh = -Infinity;
+    for (let i = from; i < n; i++) if (closes[i] > refHigh) { refHigh = closes[i]; peakIdx = i; }
+  }
   m.refHigh = refHigh; m.peakIdx = peakIdx;
   m.drawdown = cur / refHigh - 1;
 
@@ -860,7 +1075,7 @@ function computeMetrics(closes) {
   m.monthsSincePeak = (n - 1 - peakIdx) / 21;
 
   // 3 — no new lows
-  const lw = Math.min(FIXED.lowWin, n - 1);
+  const lw = Math.min(cfg.lowWin, n - 1);
   const rmin = rollingMin(closes, lw);
   let lastLow = -1;
   for (let i = n - 1; i >= lw - 1; i--) {
@@ -873,20 +1088,25 @@ function computeMetrics(closes) {
   for (let i = bf; i < n; i++) if (closes[i] < baseLow) { baseLow = closes[i]; baseLowIdx = i; }
   m.baseLow = baseLow; m.baseLowIdx = baseLowIdx;
 
-  // 4 — curvature
-  const ml = Math.min(FIXED.maLen, Math.floor(n / 2));
+  // 4 — curvature. The averages are always computed; the charts draw them either way.
+  const ml = Math.min(cfg.maLen, Math.floor(n / 2));
   const ma = sma(closes, ml);
   const tail = [];
-  for (let i = Math.max(ml - 1, n - FIXED.slopeWin); i < n; i++) if (ma[i] != null) tail.push(ma[i]);
+  for (let i = Math.max(ml - 1, n - cfg.slopeWin); i < n; i++) if (ma[i] != null) tail.push(ma[i]);
   const sl = tail.length >= 3 ? olsSlope(tail) : null;
   m.maSeries = ma;
   m.ma200 = sma(closes, Math.min(200, Math.floor(n / 2)));
   m.maVal = ma[n - 1];
   m.slopeAnn = (sl != null) ? (sl / cur) * 252 * 100 : null;
   m.aboveMA = m.maVal != null ? cur > m.maVal : null;
+  if (cfg.curvMethod === 'quad') {
+    const qw = Math.min(cfg.quadWin, n);
+    const q = quadFit(closes.slice(n - qw).map(Math.log));
+    if (q) { m.quadA = q.a; m.quadEdge = q.edge; }
+  }
 
   // 5 — volatility contraction
-  const vw = FIXED.volWin;
+  const vw = cfg.volWin;
   const rets = new Array(n - 1);
   for (let i = 1; i < n; i++) rets[i - 1] = Math.log(closes[i] / closes[i - 1]);
   const rv = [], rvIdx = [];
@@ -896,11 +1116,11 @@ function computeMetrics(closes) {
     rvIdx.push(i + 1);                       // bar index in closes this rv belongs to
   }
   if (rv.length > 30) {
-    const hist = rv.slice(Math.max(0, rv.length - FIXED.volHist));
+    const hist = rv.slice(Math.max(0, rv.length - cfg.volHist));
     const sorted = hist.slice().sort((a, b) => a - b);
     m.rv = rv[rv.length - 1];
     m.volPct = pctRank(sorted, m.rv);
-    const back = Math.min(Math.round(FIXED.volBack * 21), rv.length);
+    const back = Math.min(Math.round(cfg.volBack * 21), rv.length);
     let mx = -Infinity;
     for (let i = rv.length - back; i < rv.length; i++) if (rv[i] > mx) mx = rv[i];
     m.volPeakPct = pctRank(sorted, mx);
@@ -918,12 +1138,15 @@ function computeMetrics(closes) {
 
 function evaluateGates(m) {
   if (!m) return null;
+  const curveOK = cfg.curvMethod === 'quad'
+    ? (m.quadA != null && m.quadA > 0 && (!cfg.quadEdge || m.quadEdge > 0))
+    : (m.slopeAnn != null && m.slopeAnn > cfg.minSlope && (!cfg.aboveMA || m.aboveMA === true));
   const raw = [
     m.drawdown <= -cfg.depth / 100,
-    m.monthsSincePeak >= cfg.dur,
-    m.daysSinceLow != null && m.daysSinceLow >= cfg.minLow && m.daysSinceLow <= FIXED.maxLow,
-    m.slopeAnn != null && m.slopeAnn > 0 && m.aboveMA === true,
-    m.volPct != null && m.volPct < cfg.volLow && m.volPeakPct > FIXED.volHigh,
+    m.monthsSincePeak >= cfg.dur && (!cfg.durMax || m.monthsSincePeak <= cfg.durMax),
+    m.daysSinceLow != null && m.daysSinceLow >= cfg.minLow && m.daysSinceLow <= cfg.maxLow,
+    curveOK,
+    m.volPct != null && m.volPct < cfg.volLow && m.volPeakPct > cfg.volHigh,
   ];
   const status = [];
   let stage = 0, alive = true;
@@ -1246,7 +1469,8 @@ function openChart(key) {
   const r = state.rows.find(x => x.key === key);
   if (!r) return;
   const { c, d } = r.s, m = r.m, ev = r.ev, N = c.length;
-  const from = Math.max(0, N - 1260);
+  const from = Math.max(0, N - Math.max(cfg.depthLb, 1260));
+  const hiLabel = (cfg.depthLb / 252).toFixed(0) + 'y high';
 
   const priceChart = chart({
     dates: d, from, log: true, H: 340,
@@ -1256,7 +1480,7 @@ function openChart(key) {
       { v: c, color: '#1f5f9e', width: 1.8 },
     ],
     hlines: [
-      { v: m.refHigh, color: '#b08430', label: '5y high' },
+      { v: m.refHigh, color: '#b08430', label: hiLabel },
       { v: m.baseLow, color: '#a8402c', label: 'base low' },
     ],
     markers: [
@@ -1277,9 +1501,9 @@ function openChart(key) {
       lines: [{ v: vp, color: '#5a8fc7', width: 1.5 }],
       hlines: [
         { v: cfg.volLow, color: '#2c8a4a', label: 'quiet enough (' + cfg.volLow + ')' },
-        { v: FIXED.volHigh, color: '#a8402c', label: 'was loud (' + FIXED.volHigh + ')' },
+        { v: cfg.volHigh, color: '#a8402c', label: 'was loud (' + cfg.volHigh + ')' },
       ],
-      bands: [{ from: Math.max(from, N - 1 - FIXED.volBack * 21), to: N - 1, color: 'rgba(212,165,72,.10)' }],
+      bands: [{ from: Math.max(from, N - 1 - cfg.volBack * 21), to: N - 1, color: 'rgba(212,165,72,.10)' }],
       yFmt: v => v.toFixed(0),
     });
   }
@@ -1294,37 +1518,37 @@ function openChart(key) {
     <div class="box-sub" style="margin-top:8px">${gateLine}</div>
 
     <div class="chart-block">
-      <div class="chart-h">${r.kind === 'A' ? 'Price' : 'Ratio'}, log scale, last five years</div>
+      <div class="chart-h">${r.kind === 'A' ? 'Price' : 'Ratio'}, log scale, last ${((N-from)/252).toFixed(0)} years</div>
       <div class="chart-wrap">${priceChart}</div>
       <div class="chart-legend">
         <span><span class="sw" style="background:#1f5f9e"></span>${r.kind === 'A' ? 'Price' : 'Ratio'}</span>
-        <span><span class="sw" style="background:#c0533a"></span>100-day average</span>
+        <span><span class="sw" style="background:#c0533a"></span>${cfg.maLen}-day average</span>
         <span><span class="sw" style="background:#8a6fa8"></span>200-day average</span>
-        <span><span class="dot" style="background:#d4a548"></span>Five-year high (gate 1 reference)</span>
-        <span><span class="dot" style="background:#2c8a4a"></span>Last 252-day low (gate 3)</span>
+        <span><span class="dot" style="background:#d4a548"></span>Reference high (gate 1)</span>
+        <span><span class="dot" style="background:#2c8a4a"></span>Last ${cfg.lowWin}-day low (gate 3)</span>
         <span>Shaded: the stretch without a new low</span>
       </div>
     </div>
 
     ${volChart ? `<div class="chart-block">
-      <div class="chart-h">Volatility percentile against its own five-year history (gate 5)</div>
+      <div class="chart-h">Volatility percentile against its own ${(cfg.volHist/252).toFixed(0)}-year history (gate 5)</div>
       <div class="chart-wrap">${volChart}</div>
       <div class="chart-legend">
         <span><span class="sw" style="background:#5a8fc7"></span>20-day realised vol, ranked</span>
-        <span>Shaded: the 18-month window searched for the prior expansion</span>
+        <span>Shaded: the ${cfg.volBack}-month window searched for the prior expansion</span>
         <span>Gate 5 needs the line below the green now and above the red inside the shading</span>
       </div>
     </div>` : ''}
 
     <div class="facts">
-      <div class="fact"><div class="k">Drawdown from the 5y high</div><div class="v">${pct(m.drawdown)}</div></div>
+      <div class="fact"><div class="k">Drawdown from the ${hiLabel}</div><div class="v">${pct(m.drawdown)}</div></div>
       <div class="fact"><div class="k">Peak age</div><div class="v">${num(m.monthsSincePeak, 0)} months</div></div>
       <div class="fact"><div class="k">Days since a new low</div><div class="v">${m.daysSinceLow ?? '—'}</div></div>
-      <div class="fact"><div class="k">100-day slope</div><div class="v">${m.slopeAnn == null ? '—' : (m.slopeAnn > 0 ? '+' : '') + m.slopeAnn.toFixed(1) + '%'}</div></div>
+      <div class="fact"><div class="k">${cfg.maLen}-day slope</div><div class="v">${m.slopeAnn == null ? '—' : (m.slopeAnn > 0 ? '+' : '') + m.slopeAnn.toFixed(1) + '%'}</div></div>
       <div class="fact"><div class="k">Risk down to the base low</div><div class="v">${pct(m.riskToBase)}</div></div>
       <div class="fact"><div class="k">Upside to the prior high</div><div class="v">${pct(m.upToHigh)}</div></div>
       <div class="fact"><div class="k">Payoff ratio</div><div class="v">${m.payoff == null ? '—' : m.payoff.toFixed(1) + '×'}</div></div>
-      <div class="fact"><div class="k">Vol now / peak in 18m</div><div class="v">${m.volPct == null ? '—' : m.volPct.toFixed(0) + ' / ' + m.volPeakPct.toFixed(0)}</div></div>
+      <div class="fact"><div class="k">Vol now / peak in ${cfg.volBack}m</div><div class="v">${m.volPct == null ? '—' : m.volPct.toFixed(0) + ' / ' + m.volPeakPct.toFixed(0)}</div></div>
     </div>
   </div>`;
   $('overlay').classList.add('open');
@@ -1335,6 +1559,7 @@ function closeChart() { $('overlay').classList.remove('open'); }
 
 /* ---------- wiring ---------- */
 
+/* Screen-tab sliders. */
 const KNOBS = [
   ['k_depth', 'depth', 'v_depth', v => v + '%'],
   ['k_dur', 'dur', 'v_dur', v => v + 'm'],
@@ -1342,29 +1567,71 @@ const KNOBS = [
   ['k_volLow', 'volLow', 'v_volLow', v => v + 'th'],
 ];
 
+/* Settings-tab fields: [elementId, cfgKey, kind]. */
+const SETTINGS = [
+  ['s_depth', 'depth', 'n'], ['s_depthLb', 'depthLb', 'n'], ['s_refMode', 'refMode', 's'],
+  ['s_dur', 'dur', 'n'], ['s_durMax', 'durMax', 'n'],
+  ['s_minLow', 'minLow', 'n'], ['s_maxLow', 'maxLow', 'n'], ['s_lowWin', 'lowWin', 'n'],
+  ['s_curve', 'curve', 'b'], ['s_curvMethod', 'curvMethod', 's'], ['s_maLen', 'maLen', 'n'],
+  ['s_slopeWin', 'slopeWin', 'n'], ['s_minSlope', 'minSlope', 'n'], ['s_aboveMA', 'aboveMA', 'b'],
+  ['s_quadWin', 'quadWin', 'n'], ['s_quadEdge', 'quadEdge', 'b'],
+  ['s_volWin', 'volWin', 'n'], ['s_volLow', 'volLow', 'n'], ['s_volHigh', 'volHigh', 'n'],
+  ['s_volBack', 'volBack', 'n'], ['s_volHist', 'volHist', 'n'],
+];
+
 function cfgToUI() {
   KNOBS.forEach(([el, key, lab, f]) => { $(el).value = cfg[key]; $(lab).textContent = f(cfg[key]); });
   $('k_curve').checked = cfg.curve;
-  try { localStorage.setItem('contra2', JSON.stringify(cfg)); } catch (e) {}
-}
-
-function uiToCfg() {
-  KNOBS.forEach(([el, key]) => { cfg[key] = +$(el).value; });
-  cfg.curve = $('k_curve').checked;
+  SETTINGS.forEach(([el, key, kind]) => {
+    if (kind === 'b') $(el).checked = !!cfg[key]; else $(el).value = cfg[key];
+  });
+  document.querySelectorAll('[data-curv]').forEach(el => {
+    el.style.display = el.dataset.curv === cfg.curvMethod ? '' : 'none';
+  });
   document.querySelectorAll('#segPreset button').forEach(b => {
     const p = PRESETS[b.dataset.preset];
     b.classList.toggle('on', p && Object.keys(p).every(k => cfg[k] === p[k]));
   });
+  const changed = Object.keys(ADVANCED).filter(k => cfg[k] !== ADVANCED[k]).length;
+  $('setStatus').innerHTML = changed
+    ? `<span class="dirty">${changed} setting${changed > 1 ? 's' : ''} away from the defaults.</span> List edits apply when you click away from the box.`
+    : 'List edits apply when you click away from the box.';
+  try { localStorage.setItem('contra2', JSON.stringify(cfg)); } catch (e) {}
+}
+
+/** Read one source of truth, clamp the pairs that can invert, recompute. */
+function commit(source) {
+  if (source === 'knobs') {
+    KNOBS.forEach(([el, key]) => { cfg[key] = +$(el).value; });
+    cfg.curve = $('k_curve').checked;
+  } else {
+    SETTINGS.forEach(([el, key, kind]) => {
+      if (kind === 'b') cfg[key] = $(el).checked;
+      else if (kind === 's') cfg[key] = $(el).value;
+      else { const v = +$(el).value; if (isFinite(v)) cfg[key] = v; }
+    });
+    if (cfg.maxLow < cfg.minLow) cfg.maxLow = cfg.minLow;
+    if (cfg.durMax && cfg.durMax < cfg.dur) cfg.durMax = cfg.dur;
+    if (cfg.volHigh <= cfg.volLow) cfg.volHigh = Math.min(99, cfg.volLow + 1);
+  }
   cfgToUI();
   if (state.scanned) recompute();
 }
 
 function applyPreset(name) {
-  cfg = { ...PRESETS[name] };
-  document.querySelectorAll('#segPreset button').forEach(b =>
-    b.classList.toggle('on', b.dataset.preset === name));
+  cfg = { ...cfg, ...PRESETS[name] };   // presets move the four thresholds only
   cfgToUI();
   if (state.scanned) recompute();
+}
+
+function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
+
+/** Rebuild every series from prices already fetched, without touching the network. */
+function rebuildSeries() {
+  const next = {};
+  state.universe.forEach(u => { const s = pull(u.t); if (s) next['A:' + u.t] = s; });
+  state.pairs.forEach(p => { const s = pullRatio(p.num, p.den); if (s) next['R:' + p.num + '/' + p.den] = s; });
+  state.series = next;
 }
 
 function buildGroups() {
@@ -1372,18 +1639,55 @@ function buildGroups() {
   $('fltGroup').innerHTML = '<option value="">All groups</option>' + gs.map(g => `<option>${g}</option>`).join('');
 }
 
-function init() {
-  try { const s = localStorage.getItem('contra2'); if (s) cfg = { ...PRESETS.balanced, ...JSON.parse(s) }; } catch (e) {}
-  cfgToUI();
-  buildGroups();
+function fillLists() {
   $('universeInput').value = state.universe.map(u => `${u.t},${u.n},${u.g}`).join('\n');
   $('pairsInput').value = state.pairs.map(p => `${p.num}/${p.den},${p.label},${p.cls}`).join('\n');
+}
+
+function init() {
+  try { const s = localStorage.getItem('contra2'); if (s) cfg = { ...DEFAULTS, ...JSON.parse(s) }; } catch (e) {}
+  try {
+    const u = localStorage.getItem('contra2.universe');
+    const p = localStorage.getItem('contra2.pairs');
+    if (u) state.universe = JSON.parse(u);
+    if (p) state.pairs = JSON.parse(p);
+  } catch (e) {}
+  cfgToUI();
+  buildGroups();
+  fillLists();
   $('cutList').innerHTML = EXCLUDED.map(c => `<b>${c.t}</b> — ${c.why}`).join('<br>');
 
-  KNOBS.forEach(([el]) => $(el).addEventListener('input', uiToCfg));
-  $('k_curve').addEventListener('change', uiToCfg);
+  KNOBS.forEach(([el]) => $(el).addEventListener('input', () => commit('knobs')));
+  $('k_curve').addEventListener('change', () => commit('knobs'));
+  SETTINGS.forEach(([el]) => $(el).addEventListener('change', () => commit('settings')));
   document.querySelectorAll('#segPreset button').forEach(b =>
     b.addEventListener('click', () => applyPreset(b.dataset.preset)));
+
+  document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.tabs button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    document.body.classList.toggle('settings', b.dataset.tab === 'settings');
+    try { window.scrollTo(0, 0); } catch (e) {}
+  }));
+
+  $('resetAll').addEventListener('click', () => {
+    cfg = { ...DEFAULTS };
+    state.universe = DEFAULT_UNIVERSE.slice();
+    state.pairs = DEFAULT_PAIRS.slice();
+    try { localStorage.removeItem('contra2.universe'); localStorage.removeItem('contra2.pairs'); } catch (e) {}
+    fillLists();
+    buildGroups();
+    cfgToUI();
+    if (state.scanned) { rebuildSeries(); recompute(); }
+  });
+
+  $('copyCfg').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(cfg, null, 2));
+      $('copyCfg').textContent = 'Copied';
+      setTimeout(() => { $('copyCfg').textContent = 'Copy settings as JSON'; }, 1600);
+    } catch (e) { $('setStatus').textContent = 'Clipboard blocked by the browser.'; }
+  });
 
   $('scanBtn').addEventListener('click', runScan);
   $('tuneBtn').addEventListener('click', () => {
@@ -1415,9 +1719,15 @@ function init() {
       const [t, n, g] = l.split(',').map(s => (s || '').trim());
       return t ? { t: t.toUpperCase(), n: n || t, g: g || 'Custom' } : null;
     }).filter(Boolean);
-    if (next.length) { state.universe = next; state.scanned = false; buildGroups();
-      setStatus('Asset list changed — run a scan.', 0); }
+    if (!next.length) return;
+    state.universe = next;
+    state.scanned = false;
+    buildGroups();
+    save('contra2.universe', next);
+    $('setStatus').innerHTML = '<span class="dirty">Asset list changed — run a scan from the Screen tab.</span>';
+    setStatus('Asset list changed — run a scan.', 0);
   });
+
   $('pairsInput').addEventListener('change', () => {
     const next = $('pairsInput').value.split('\n').map(l => l.trim()).filter(Boolean).map(l => {
       const [pair, label, cls] = l.split(',').map(s => (s || '').trim());
@@ -1428,13 +1738,14 @@ function init() {
     if (!next.length) return;
     state.pairs = next;
     buildGroups();
-    if (state.scanned) {
-      state.pairs.forEach(p => {
-        const k = 'R:' + p.num + '/' + p.den;
-        if (!state.series[k]) { const s = pullRatio(p.num, p.den); if (s) state.series[k] = s; }
-      });
-      recompute();
-    }
+    save('contra2.pairs', next);
+    if (!state.scanned) return;
+    rebuildSeries();
+    const missing = state.pairs.filter(p => !state.series['R:' + p.num + '/' + p.den]);
+    $('setStatus').innerHTML = missing.length
+      ? `<span class="dirty">${missing.length} ratio${missing.length > 1 ? 's' : ''} skipped — a leg is not in the asset list: ${missing.slice(0, 6).map(p => p.num + '/' + p.den).join(', ')}${missing.length > 6 ? '…' : ''}</span>`
+      : `${state.pairs.length} ratios rebuilt from prices already in memory.`;
+    recompute();
   });
 
   renderFunnels();
