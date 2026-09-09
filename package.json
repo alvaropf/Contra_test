@@ -1,6 +1,6 @@
 {
   "name": "contrarian-cascade",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Five-gate contrarian screen across an ETF universe and its ratios",
   "scripts": {
